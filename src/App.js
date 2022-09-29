@@ -9,6 +9,10 @@ import "./App.css";
 
 const App = () => {
   //useSTATE
+// //   useState is a hook to track data that belongs to the function component. 
+// When state changes, the function component responds by re-rendering. 
+// In this case, the data is users' wallet addresses.
+  const [walletAddress, setWalletAddress] = useState(null);
   
   //TOASTS
 
@@ -28,21 +32,34 @@ const App = () => {
                     'Connected with Public Key:',
                     response.publicKey.toString()
                 );
+                setWalletAddress(response.publicKey.toString());
             }
         } else {
-            alert('To sign in, download a Phantom Wallet 👻 at https://phantom.app');
+            alert('To sign in, download a Phantom Wallet 👻 at https://phantom.app'
+            );
         }
     } catch (error) {
         console.error(error);
     }
-  }
+  };
 
-  const connectWallet = async () => {}; 
+  const connectWallet = async () => {
+    const { solana } = window;
+
+    if (solana) {
+        const response = await solana.connect();
+        console.log(
+            'Connected with Public Key:', 
+        response.publicKey.toString()
+        );
+        setWalletAddress(response.publicKey.toString());
+    }
+  }; 
 
   const renderNotConnectedContainer = () => (
-
+    // conditional rendering depending on the state of the dApp
     <div className="container">
-      <button
+    <button
         className="cta-button connect-wallet-button"
         onClick={connectWallet}
        >
@@ -62,10 +79,11 @@ useEffect(() => {
     };
     window.addEventListener('load', onLoad);
     return () => window.removeEventListener('load', onLoad);
-}, {});
+}, []);
+
   return (
     <div className="App">
-      <div className="container">
+      <div className={walletAddress ? 'authed-container' : 'container'}>
         <Toaster
           toastOptions={{
             className: "",
@@ -77,7 +95,9 @@ useEffect(() => {
             },
           }}
         />
-        <div className="header-container">{renderNotConnectedContainer()}</div>
+        <div className="header-container">
+            {!walletAddress && renderNotConnectedContainer()}
+        </div>
       </div>
     </div>
   );
