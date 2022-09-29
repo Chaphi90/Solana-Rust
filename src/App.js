@@ -36,8 +36,18 @@ const App = () => {
         console.error(error);
     }
   }
+
+  const connectWallet = async () => {}; 
+
   const renderNotConnectedContainer = () => (
+
     <div className="container">
+      <button
+        className="cta-button connect-wallet-button"
+        onClick={connectWallet}
+       >
+        SIGN IN      
+      </button>
       <p className="header">Scene Portal</p>
       <p className="sub-header">Your favorite scenes, on the blockchain</p>
       <div className="moon" />
