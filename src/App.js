@@ -13,6 +13,7 @@ const App = () => {
 // When state changes, the function component responds by re-rendering. 
 // In this case, the data is users' wallet addresses.
   const [walletAddress, setWalletAddress] = useState(null);
+  const [inputValue, setInputValue] = useState('')
   
   //TOASTS
 
@@ -56,6 +57,24 @@ const App = () => {
     }
   }; 
 
+  const disconnectWallet = () => {
+    console.log("Wallet Disconnected");
+    setWalletAddress(null);
+  };
+
+  const onInputChange = (event) => {
+    const { value } = event.target;
+    setInputValue(value);
+   }; 
+
+  const sendGif = async () => {
+    if (inputValue.length > 0) {
+        console.log('Gif link:', inputValue);
+    } else {
+        console.log('Empty input. Try again');
+    }
+  };
+
   const renderNotConnectedContainer = () => (
     // conditional rendering depending on the state of the dApp
     <div className="container">
@@ -69,6 +88,33 @@ const App = () => {
       <p className="sub-header">Your favorite scenes, on the blockchain</p>
       <div className="moon" />
       <div className="kiki" />
+    </div>
+  );
+
+  const renderConnectedContainer = () => (
+    <div className="connected-container">
+        <p className="connected-header">SCENE PORTAL</p>
+        <button className="cta-button disconnect-wallet-button" 
+        onClick={disconnectWallet}
+        >
+            SIGN OUT
+        </button>
+        <form 
+        className="form"
+        onSubmit={(event) => {
+            event.preventDefault();
+            sendGif();
+        }}
+        >
+            <input type="text" 
+            placeholder="post your favorite film/tv scene"
+            value={inputValue}
+            onChange={onInputChange}
+            />
+            <button type="submit" className="cta-button submit-gif-button">
+            Submit
+            </button>
+        </form>
     </div>
   );
 
@@ -97,6 +143,7 @@ useEffect(() => {
         />
         <div className="header-container">
             {!walletAddress && renderNotConnectedContainer()}
+            {walletAddress && renderConnectedContainer()}
         </div>
       </div>
     </div>
