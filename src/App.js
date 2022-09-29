@@ -6,6 +6,11 @@ import toast, { Toaster } from "react-hot-toast";
 import "./App.css";
 
 //CONSTANTS
+const TEST_GIFS = [
+	'https://media.giphy.com/media/35LCBkf6buF9AuzOL7/giphy.gif',
+	'https://media.giphy.com/media/pxuSx9i61E40xaAFyF/giphy.gif',
+	'https://media.giphy.com/media/26gspNQegsL4F1Sqk/giphy.gif'
+]
 
 const App = () => {
   //useSTATE
@@ -14,8 +19,14 @@ const App = () => {
 // In this case, the data is users' wallet addresses.
   const [walletAddress, setWalletAddress] = useState(null);
   const [inputValue, setInputValue] = useState('')
+  const [gifList, setGifList] = useState([]);
   
   //TOASTS
+  const showPhantomToast = () => 
+        toast("To sign in, download a Phantom wallet👻 at https://phantom.app");
+    const showConnectedWalletToast = () => toast.success("You're signed in!");
+    const showDisconnectedWalletToast = () => toast.success("You've signed out!");
+    const showGifSentToast = () => toast.success("GIF Sent!");
 
   //ACTIONS
 //  Here we’re checking the window object in our DOM to see if the Phantom Wallet extension has injected the solana object. If we do have an solana object, we can also check to see if it's a Phantom Wallet.
@@ -36,8 +47,7 @@ const App = () => {
                 setWalletAddress(response.publicKey.toString());
             }
         } else {
-            alert('To sign in, download a Phantom Wallet 👻 at https://phantom.app'
-            );
+          showPhantomToast();
         }
     } catch (error) {
         console.error(error);
@@ -54,12 +64,14 @@ const App = () => {
         response.publicKey.toString()
         );
         setWalletAddress(response.publicKey.toString());
+        showConnectedWalletToast();
     }
   }; 
 
   const disconnectWallet = () => {
     console.log("Wallet Disconnected");
     setWalletAddress(null);
+    showDisconnectedWalletToast();
   };
 
   const onInputChange = (event) => {
@@ -70,6 +82,9 @@ const App = () => {
   const sendGif = async () => {
     if (inputValue.length > 0) {
         console.log('Gif link:', inputValue);
+        setGifList([...gifList, inputValue]); // user submits the form, the state property will add the GIF to gifList
+        setInputValue(''); //clear the text field
+        showGifSentToast();
     } else {
         console.log('Empty input. Try again');
     }
@@ -115,6 +130,13 @@ const App = () => {
             Submit
             </button>
         </form>
+        <div className="gif-grid">
+            {gifList.map((gif) => (
+                <div className="gif-item" key={gif}>
+                    <img className="gif-image" src={gif} alt={gif} />
+                </div>
+            ))}
+        </div>
     </div>
   );
 
@@ -126,6 +148,16 @@ useEffect(() => {
     window.addEventListener('load', onLoad);
     return () => window.removeEventListener('load', onLoad);
 }, []);
+
+useEffect(() => {
+    if (walletAddress) {
+        console.log("Fetching GIF list...");
+
+        // Call Solana program here.
+
+        setGifList(TEST_GIFS);
+    }
+}, [walletAddress]);
 
   return (
     <div className="App">
